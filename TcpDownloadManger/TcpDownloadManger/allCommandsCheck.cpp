@@ -14,15 +14,20 @@
 #include "clientOperations.h"
 using namespace std;
 
-void commandChecker(string command){
+char *commandChecker(string command){
+    //char lst[] = "hello last";
+    
     vector<string> dividedString = fetchEachString(command);
     string firstCommand = dividedString[0];
     if(firstCommand == "create_user"){
-        NewUserRegistration(dividedString);
+        char *userRegisterStatus = NewUserRegistration(dividedString);
+        return userRegisterStatus;
     }
     else if (firstCommand == "login"){
         string user = dividedString[1];
-        checkValidUser(user);
+        string password = dividedString[2];
+        char *validUser = checkValidUser(user,password);
+        return validUser;
     }
     else if (firstCommand == "create_group"){
         cout << "create_group" <<endl;
@@ -60,10 +65,9 @@ void commandChecker(string command){
     else if (firstCommand == "stop_share"){
         cout << "stop_share" <<endl;
     }
-    else{
-        cout << "command not found" <<endl;
-    }
-
+    string someString= "Operation not found";
+    char *notfound = returnCharArray(someString);
+    return notfound;
 }
 
 /* break lines in to strings*/

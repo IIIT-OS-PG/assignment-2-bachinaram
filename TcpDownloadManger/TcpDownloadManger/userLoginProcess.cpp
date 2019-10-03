@@ -11,27 +11,60 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <map>
+#include<string.h>
 #include "clientOperations.h"
 using namespace std;
 
 
-void NewUserRegistration(vector<string> user_creation_command){
+char *NewUserRegistration(vector<string> user_creation_command){
     string fName = user_creation_command[1];
     string password = user_creation_command[2];
-    fileCreation(fName);
-    fileWriting(fName,password);
-    cout << fName << " created successfully" << endl;
-    cout << "Now try login with your user id" << endl;
-    return;
+    
+    
+    //conversion of string to char and adding the char to char array
+    char *notResult = new char [fName.length()+1];
+    strcpy (notResult, fName.c_str());
+    char *Result = new char [fName.length()+1];
+    strcpy (Result, fName.c_str());
+    
+    
+    int creationFile = fileCreation(fName);
+    if(creationFile == 1){
+        strcat(notResult," creation failed");
+        return notResult;
+    }
+    else{
+        int writingFile = fileWriting(fName,password);
+        if(writingFile==0){
+            strcat(Result," created successfully, now try login");
+        }
+    }
+    return Result;
 }
 
-void checkValidUser(string user){
-    if(fileExists(user)==1){
-        cout << "user exists"<<endl;
-        cout << "login successful"<<endl;
+char *checkValidUser(string user,string password){
+    char *returnUser = returnCharArray(user);
+    if(fileExists(user)==0){
+        strcat(returnUser," does not exists, please register");
+        return returnUser;
     }
-    else
-    {
-        cout << user <<" doesn't exists! Please register"<<endl;
+    
+    char *retUser = returnCharArray(user);
+    map<string, string> userPassAuthMap;
+    userPassAuthMap=getString(user);
+    char *map_userPass = returnCharArray(userPassAuthMap[user]);
+    char *tmp_pass = returnCharArray(password);
+  /*
+    if(userPassAuthMap.find(user)!=userPassAuthMap.end()){
+        strcat(returnUser," does not exists, please register");
+        return returnUser;
     }
+ */
+    if(strcmp(map_userPass,tmp_pass) == 0){
+        strcat(retUser," login successful");
+        return retUser;
+    }
+    strcat(retUser,", check your password");
+    return retUser;
 }

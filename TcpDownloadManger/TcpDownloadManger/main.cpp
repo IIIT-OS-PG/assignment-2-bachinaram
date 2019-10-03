@@ -18,9 +18,7 @@
  #include "clientOperations.h"
 /*
  cout << "Welcome to File tracker system"<<endl;
-string client_command;
-getline(cin, client_command);
-commandChecker(client_command);
+
 */
 using namespace std;
 int main(int argc, const char * argv[]) {
@@ -28,6 +26,7 @@ int main(int argc, const char * argv[]) {
     int add_count;
     int accept_socket=0;
     char buffer[2000];
+    char *result;
     struct sockaddr_in socket_address;
     add_count=sizeof(socket_address);
     
@@ -66,13 +65,22 @@ int main(int argc, const char * argv[]) {
             cout << "Client has quit the session" << endl;
             break;
         }
-        cout << "Client: " << buffer << endl;
-        cout << ">";
-        string hello;
-        getline(cin,hello);
+        string stringBuffer(buffer);
+        cout << stringBuffer <<endl;
+        result = commandChecker(stringBuffer);
+        cout<<result<<endl;
+        cout << "ClientEntered: " << buffer << endl;
+        
+        //cout << ">";
+        string client_command=string(result);
+        //getline(cin, client_command);
+        //const char *client_request = commandChecker(buffer);
+        //cout<<client_request<<endl;
         memset(&buffer, 0, sizeof(buffer));
-        strcpy(buffer, hello.c_str());
-        if(hello == "exit")
+        strcpy(buffer, client_command.c_str());
+        //int result = strcmp(client_command,"exit");
+        //if(result == 0)
+        if(client_command=="exit")
         {
             send(accept_socket, buffer, sizeof(buffer), 0);
             break;

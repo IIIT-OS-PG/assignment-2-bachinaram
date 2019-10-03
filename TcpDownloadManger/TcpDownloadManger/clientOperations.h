@@ -12,13 +12,17 @@
 
 #endif /* clientOperations_h */
 #include <string>
+#include<map>
+#include<string.h>
 #include <vector>
 using namespace std;
-void commandChecker(string client_command);
+char *commandChecker(string client_command);
 vector<string> fetchEachString(string command);
-void NewUserRegistration(vector <string> user_creation_command);
-void fileCreation(string fName);
-void fileWriting(string key,string value);
+char *NewUserRegistration(vector <string> user_creation_command);
+bool fileCreation(string fName);
+bool fileWriting(string key,string value);
 bool fileExists(string fileName);
-void checkValidUser(string user);
-
+char *checkValidUser(string user,string password);
+char *returnCharArray(string someString);
+map<string,string> getString(string user);
+//int helloWorld(char str1);
