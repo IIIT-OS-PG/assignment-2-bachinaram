@@ -1,6 +1,6 @@
 //
 //  main.cpp
-//  TcpDownloadManger
+//  TCPClient
 //
 //  Created by Ram Pratap Bachina on 30/09/19.
 //  Copyright © 2019 Ram Pratap Bachina. All rights reserved.
