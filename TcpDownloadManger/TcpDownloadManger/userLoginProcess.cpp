@@ -62,7 +62,7 @@ char *checkValidUser(string user,string password){
     }
  */
     if(strcmp(map_userPass,tmp_pass) == 0){
-        strcat(retUser," login successful");
+        strcat(retUser," loggedin");
         return retUser;
     }
     strcat(retUser,", check your password");

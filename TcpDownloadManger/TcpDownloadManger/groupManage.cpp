@@ -7,3 +7,10 @@
 //
 
 #include <stdio.h>
+#include <iostream>
+#include "clientOperations.h"
+using namespace std;
+
+char *NewGroup(string grpId){
+    
+}

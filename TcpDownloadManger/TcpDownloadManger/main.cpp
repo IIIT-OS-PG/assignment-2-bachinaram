@@ -9,11 +9,13 @@
 #include <iostream>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <string>
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <arpa/inet.h>
 #define PORT 1212
  #include "clientOperations.h"
 /*
@@ -22,13 +24,26 @@
 */
 using namespace std;
 int main(int argc, const char * argv[]) {
-    int fd_tracker;
-    int add_count;
-    int accept_socket=0;
+    int fd_tracker; //mastersocket
+    int add_count; //addrelen
+    int accept_socket=0; //accept newsocket
+    /*async*/
+    int client_socket[30],max_clients=30,activity,i,sd;
+    int max_sd;
+    /*async*/
+    
     char buffer[2000];
     char *result;
     struct sockaddr_in socket_address;
     add_count=sizeof(socket_address);
+    
+    /*async*/
+    fd_set readfds;
+    for (i = 0; i < max_clients; i++)
+    {
+        client_socket[i] = 0;
+    }
+    /*async*/
     
     fd_tracker = socket(AF_INET,SOCK_STREAM,0);
     if(fd_tracker < 0){
@@ -48,49 +63,75 @@ int main(int argc, const char * argv[]) {
         exit(1);
     }
     
-    accept_socket = accept(fd_tracker,(struct sockaddr *)&socket_address,(socklen_t*)&add_count);
-    if(accept_socket<0){
-        perror("Unable to accept requests");
-        exit(1);
-    }
+    
+    
+    
     
     while(1){
-        
-        cout << "server got connection"<<endl;
-        cout << "Awaiting client response..." << endl;
-        memset(&buffer, 0, sizeof(buffer));
-        recv(accept_socket, buffer, sizeof(buffer),0);
-        if(!strcmp(buffer, "exit"))
+        FD_ZERO(&readfds);
+        FD_SET(fd_tracker, &readfds);
+        max_sd = fd_tracker;
+        for ( i = 0 ; i < max_clients ; i++)
         {
-            cout << "Client has quit the session" << endl;
-            break;
+            sd = client_socket[i];
+            if(sd > 0)
+            FD_SET( sd , &readfds);
+            if(sd > max_sd){
+                max_sd = sd;
+            }
         }
-        string stringBuffer(buffer);
-        cout << stringBuffer <<endl;
-        result = commandChecker(stringBuffer);
-        cout<<result<<endl;
-        cout << "ClientEntered: " << buffer << endl;
+        activity = select(max_sd + 1,&readfds,NULL,NULL,NULL);
+        if (FD_ISSET(fd_tracker, &readfds)){
+            accept_socket = accept(fd_tracker,(struct sockaddr *)&socket_address,(socklen_t*)&add_count);
+            if(accept_socket<0){
+                perror("Unable to accept requests");
+                exit(1);
+            }
+            cout << "some client hit the server"<<endl;
+            //cout << "Awaiting client response..." << endl;
+            for (i = 0; i < max_clients; i++){
+                if( client_socket[i] == 0 ){
+                    client_socket[i] = accept_socket;
+                    printf("Adding to list of sockets as %d\n" , i);
+                    break;
+                }
+            }
+        }
         
-        //cout << ">";
-        string client_command=string(result);
-        //getline(cin, client_command);
-        //const char *client_request = commandChecker(buffer);
-        //cout<<client_request<<endl;
-        memset(&buffer, 0, sizeof(buffer));
-        strcpy(buffer, client_command.c_str());
-        //int result = strcmp(client_command,"exit");
-        //if(result == 0)
-        if(client_command=="exit")
-        {
-            send(accept_socket, buffer, sizeof(buffer), 0);
-            break;
+        for (i = 0; i < max_clients; i++){
+            sd = client_socket[i];
+            if (FD_ISSET( sd , &readfds)){
+                memset(&buffer, 0, sizeof(buffer));
+                recv(sd, buffer, sizeof(buffer),0);
+                if(!strcmp(buffer, "exit")){
+                    cout << "Client has quit the session" << endl;
+                    close(sd);
+                    client_socket[i] = 0;
+                    break;
+                }
+                string stringBuffer(buffer);
+                cout << stringBuffer <<endl;
+                result = commandChecker(stringBuffer);
+                cout<<result<<endl;
+                cout << "ClientEntered: " << buffer << endl;
+                string client_command=string(result);
+                
+                memset(&buffer, 0, sizeof(buffer));
+                strcpy(buffer, client_command.c_str());
+
+                if(client_command=="exit")
+                {
+                    send(sd, buffer, sizeof(buffer), 0);
+                    break;
+                }
+                send(sd, buffer, sizeof(buffer), 0);
+                sleep(1);
+                }
         }
-        send(accept_socket, buffer, sizeof(buffer), 0);
-        sleep(1);
     }
-    close(accept_socket);
-    close(fd_tracker);
-    return 0;
+        //close(accept_socket);
+        //close(fd_tracker);
+        return 0;
 }
 
 

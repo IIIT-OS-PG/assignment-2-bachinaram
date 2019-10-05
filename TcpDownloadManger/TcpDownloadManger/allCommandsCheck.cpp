@@ -30,7 +30,9 @@ char *commandChecker(string command){
         return validUser;
     }
     else if (firstCommand == "create_group"){
-        cout << "create_group" <<endl;
+        string groupId = dividedString[1];
+        char *groupRegistration = NewGroup(groupId);
+        return groupRegistration;
     }
     else if (firstCommand == "join_group"){
         cout << "join_group" <<endl;

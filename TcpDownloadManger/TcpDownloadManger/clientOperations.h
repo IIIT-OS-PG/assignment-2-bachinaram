@@ -25,4 +25,5 @@ bool fileExists(string fileName);
 char *checkValidUser(string user,string password);
 char *returnCharArray(string someString);
 map<string,string> getString(string user);
+char *NewGroup(string grpId);
 //int helloWorld(char str1);
