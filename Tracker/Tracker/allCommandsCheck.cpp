@@ -46,14 +46,17 @@ char *commandChecker(string command){
         char *groupLeave = removeUserFromGroup(groupUser, groupId);
         return groupLeave;
     }
+    else if (firstCommand == "list_groups"){
+        char *allGroups = getAllGroups();
+        return allGroups;
+    }
     else if (firstCommand == "list_requests"){
-        cout << "list_requests" <<endl;
+        string groupUser = dividedString[0];
+        char *allPendingUsers = getAllPendingUsers(groupUser);
+        return allPendingUsers;
     }
     else if (firstCommand == "accept_request"){
         cout << "accept_request" <<endl;
-    }
-    else if (firstCommand == "list_groups"){
-        cout << "list_groups" <<endl;
     }
     else if (firstCommand == "list_files"){
         cout << "list_files" <<endl;

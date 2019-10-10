@@ -124,7 +124,7 @@ int main(int argc, const char * argv[]) {
                 if(client_command=="exit")
                 {
                     send(sd, buffer, sizeof(buffer), 0);
-                    break;
+                    //break;
                 }
                 
                 send(sd, buffer, sizeof(buffer), 0);

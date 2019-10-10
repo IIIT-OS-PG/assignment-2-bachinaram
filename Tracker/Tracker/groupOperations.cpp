@@ -8,6 +8,9 @@
 
 #include <stdio.h>
 #include <string>
+#include <vector>
+#include <string.h>
+#include <sstream>
 #include "TrackerOperations.h"
 using namespace std;
 
@@ -67,4 +70,31 @@ char *removeUserFromGroup(string groupUser, string grpId){
     }
     char *memberLine = removeUserFromGroupFile(groupUser, grpId);
     return memberLine;
+}
+
+
+char *getAllGroups(){
+    char *files;
+    string allfiles = getAllFiles();
+    files = returnCharArray(allfiles);
+    return files;
+}
+
+char *getAllPendingUsers(string groupUser){
+    char *groups;
+    string results;
+    //try to findout groups that user is owner of
+    string allOwnerGroups = getAllOwnerGroups(groupUser);
+    stringstream ss(allOwnerGroups);
+    string eachString;
+    while (getline(ss, eachString, ' ')) {
+        if(eachString.compare(".")!=0||eachString.compare("..")!=0){
+            string result = getPendingUsers(eachString);
+            results.append(result+" ");
+            //results.append(result);
+        }
+    }
+    groups = returnCharArray(results);
+
+    return groups;
 }

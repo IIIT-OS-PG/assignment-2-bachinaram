@@ -15,6 +15,7 @@
 #include<map>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <dirent.h>
 #include "TrackerOperations.h"
 using namespace std;
 
@@ -53,7 +54,7 @@ bool groupFileWriting(string grpOwn,string grpId){
     file << id+"="+grpId<<endl;
     file << "owner="+grpOwn<<endl;
     file << "members="<<endl;
-    file << "waiting="<<endl;
+    file << "pending="<<endl;
     file.close();
     return 0;
 }
@@ -108,7 +109,8 @@ char *readGroupFile(string groupUser,string groupId){
     char *oldFile = returnCharArray(fullPath1);
     char *newFile = returnCharArray(fullPath2);
     char *memberLine;
-    string members="members=";
+    //string members="members=";
+    string members="pending=";
     string user=groupUser+",";
     string eachLine;
     ifstream grpFile;
@@ -164,4 +166,95 @@ char *removeUserFromGroupFile(string groupUser, string groupId){
         rename(newFile,oldFile);
     }
     return memberLine;
+}
+
+
+//read all files from the given directory
+string getAllFiles(){
+    struct dirent *pDirent;
+    DIR *dr = opendir("./groups");
+    string files;
+    string nodir = "No Groups available in network";
+    if(dr == 0){
+        return nodir;
+    }
+    while ((pDirent = readdir(dr)) != NULL){
+        string file = pDirent->d_name;
+        files.append(file+" ");
+    }
+    closedir(dr);
+    return files;
+}
+
+string getAllOwnerGroups(string groupUser){
+    struct dirent *pDirent;
+    bool check;
+    string files;
+    string nothing = "You are not owner of any group";
+    DIR *dr = opendir("./groups");
+    string nodir = "No Groups available in network";
+    if(dr == 0){
+        return nodir;
+    }
+    while ((pDirent = readdir(dr)) != NULL){
+        string file = pDirent->d_name;
+        check = readFile(groupUser, file);
+        if(check){
+            files.append(file+" ");
+        }
+    }
+    closedir(dr);
+    if(files.empty()){
+        return nothing;
+    }
+    return files;
+}
+
+//read each file and check the argument passed file has that owner
+bool readFile(string user, string file){
+    string fullPath = "groups/"+file;
+    string owner="owner="+user;
+    string eachLine;
+    bool myReturn = true;
+    ifstream grpFile;
+    grpFile.open(fullPath,ios::in);
+    if(grpFile.is_open()){
+        while(getline(grpFile,eachLine)){
+            if(eachLine.find(owner) != string::npos){
+                myReturn = true;
+                break;
+            }
+            else{
+                myReturn = false;
+            }
+        }
+        grpFile.close();
+    }
+    return myReturn;
+}
+
+//read a file for oending requests
+string getPendingUsers(string fileName){
+    string fullPath = "groups/"+fileName;
+    string members="pending=";
+    string eachLine;
+    string tmpLine;
+    ifstream grpFile;
+    grpFile.open(fullPath,ios::in);
+    if(grpFile.is_open()){
+        while(getline(grpFile,eachLine)){
+            if(eachLine.find(members) != string::npos){
+                //tmpLine=eachLine.substr(eachLine.find(members) + 1);
+                tmpLine=fileName+"->"+eachLine;
+                break;
+            }
+        }
+        grpFile.close();
+    }
+    /*
+    if(tmpLine.empty()){
+        return members;
+    }
+     */
+    return tmpLine;
 }
