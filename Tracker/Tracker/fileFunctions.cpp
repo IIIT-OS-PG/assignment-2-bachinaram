@@ -103,14 +103,14 @@ map<string,string> getString(string user){
 
 
 
-char *readGroupFile(string groupUser,string groupId){
+char *readGroupFile(string groupUser,string groupId, string members){
     string fullPath1 = "groups/"+groupId;
     string fullPath2 = "groups/"+groupId+".temp";
     char *oldFile = returnCharArray(fullPath1);
     char *newFile = returnCharArray(fullPath2);
     char *memberLine;
-    //string members="members=";
-    string members="pending=";
+
+    //string members="pending=";
     string user=groupUser+",";
     string eachLine;
     ifstream grpFile;
@@ -136,13 +136,13 @@ char *readGroupFile(string groupUser,string groupId){
 }
 
 
-char *removeUserFromGroupFile(string groupUser, string groupId){
+char *removeUserFromGroupFile(string groupUser, string groupId, string members){
     string fullPath1 = "groups/"+groupId;
     string fullPath2 = "groups/"+groupId+".temp";
     char *oldFile = returnCharArray(fullPath1);
     char *newFile = returnCharArray(fullPath2);
     char *memberLine;
-    string members="members=";
+    //string members="members=";
     string user=groupUser+",";
     string eachLine;
     ifstream grpFile;

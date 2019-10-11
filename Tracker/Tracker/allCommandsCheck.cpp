@@ -56,7 +56,11 @@ char *commandChecker(string command){
         return allPendingUsers;
     }
     else if (firstCommand == "accept_request"){
-        cout << "accept_request" <<endl;
+        string groupOwner = dividedString[0];
+        string groupId = dividedString[2];
+        string groupUser = dividedString[3];
+        char *acceptStatus = addPendingUsersToGroup(groupOwner,groupId,groupUser);
+        return acceptStatus;
     }
     else if (firstCommand == "list_files"){
         cout << "list_files" <<endl;
